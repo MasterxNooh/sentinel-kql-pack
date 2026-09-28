@@ -49,7 +49,17 @@ To save a query as a scheduled analytics rule:
 2. Paste the query into the rule logic.
 3. Set the schedule and alert threshold appropriate to your environment.
 
+
 ## Validation
 
-```bash
-python3 validate_kql.py
+Run the validator to confirm all query files are well-formed:
+
+    python3 validate_kql.py
+
+## Testing Note
+
+Queries are validated for structural correctness. To test against live data, deploy them in a Microsoft Sentinel workspace with the relevant data connectors enabled.
+
+## License
+
+MIT
