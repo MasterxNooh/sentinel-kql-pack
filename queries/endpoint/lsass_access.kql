@@ -1,0 +1,8 @@
+// LSASS access - potential credential dumping
+// MITRE: T1003.001
+DeviceEvents
+| where TimeGenerated > ago(1d)
+| where ActionType == "ProcessAccess"
+| where AdditionalFields has "lsass.exe"
+| where AdditionalFields has_any ("0x1010", "0x1410", "0x1438", "0x143a", "0x1fffff")
+| project TimeGenerated, DeviceName, InitiatingProcessFileName, InitiatingProcessCommandLine

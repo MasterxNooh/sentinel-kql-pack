@@ -1,0 +1,13 @@
+// Privileged role assignment in Azure AD
+// MITRE: T1098.003
+AuditLogs
+| where TimeGenerated > ago(24h)
+| where OperationName has_any ("Add member to role", "Add eligible member to role")
+| extend TargetUser = tostring(TargetResources[0].userPrincipalName)
+| extend RoleName = tostring(TargetResources[0].displayName)
+| where RoleName has_any ("Global Administrator", "Privileged Role Administrator",
+                          "Security Administrator", "Exchange Administrator",
+                          "SharePoint Administrator", "Conditional Access Administrator")
+| project TimeGenerated,
+          InitiatedBy = tostring(InitiatedBy.user.userPrincipalName),
+          TargetUser, RoleName, Result

@@ -1,0 +1,11 @@
+// Office or PDF spawning a shell - classic phishing behavior
+// MITRE: T1204.002
+DeviceProcessEvents
+| where TimeGenerated > ago(1d)
+| where InitiatingProcessFileName in~ ("winword.exe", "excel.exe", "powerpnt.exe",
+                                        "outlook.exe", "acrord32.exe")
+| where FileName in~ ("cmd.exe", "powershell.exe", "wscript.exe", "cscript.exe",
+                      "mshta.exe", "rundll32.exe", "regsvr32.exe")
+| project TimeGenerated, DeviceName, AccountName,
+          ParentProcess = InitiatingProcessFileName, ChildProcess = FileName,
+          ProcessCommandLine

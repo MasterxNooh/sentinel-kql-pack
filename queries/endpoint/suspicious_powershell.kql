@@ -1,0 +1,9 @@
+// Suspicious PowerShell - encoded, download, or IEX patterns
+// MITRE: T1059.001
+DeviceProcessEvents
+| where TimeGenerated > ago(1d)
+| where FileName in~ ("powershell.exe", "pwsh.exe")
+| where ProcessCommandLine has_any ("-enc", "-encodedcommand", "FromBase64String",
+                                     "IEX", "Invoke-Expression", "DownloadString",
+                                     "Net.WebClient", "-nop", "-w hidden")
+| project TimeGenerated, DeviceName, AccountName, ProcessCommandLine, InitiatingProcessFileName

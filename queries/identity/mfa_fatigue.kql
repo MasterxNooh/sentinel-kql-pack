@@ -1,0 +1,8 @@
+// MFA fatigue - many MFA prompts for one user in short time
+// MITRE: T1621
+SigninLogs
+| where TimeGenerated > ago(1h)
+| where ResultType in ("500121", "50074")
+| summarize MFAPrompts = count() by UserPrincipalName, IPAddress, bin(TimeGenerated, 5m)
+| where MFAPrompts > 5
+| order by MFAPrompts desc

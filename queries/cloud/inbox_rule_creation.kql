@@ -1,0 +1,8 @@
+// Suspicious inbox rule creation (exfiltration prep)
+// MITRE: T1114.003
+OfficeActivity
+| where TimeGenerated > ago(1d)
+| where Operation in ("New-InboxRule", "Set-InboxRule", "Update-InboxRule")
+| where Parameters has_any ("DeleteMessage", "MoveToFolder", "ForwardTo",
+                             "RedirectTo", "MarkAsRead")
+| project TimeGenerated, UserId, ClientIP, Operation, Parameters

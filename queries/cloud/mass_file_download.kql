@@ -1,0 +1,9 @@
+// Mass file download from SharePoint or OneDrive
+// MITRE: T1530
+OfficeActivity
+| where TimeGenerated > ago(1h)
+| where Operation in ("FileDownloaded", "FileAccessed", "FileSyncDownloadedFull")
+| summarize FileCount = count(), UniqueFiles = dcount(OfficeObjectId)
+          by UserId, ClientIP, bin(TimeGenerated, 15m)
+| where FileCount > 100 or UniqueFiles > 50
+| order by FileCount desc

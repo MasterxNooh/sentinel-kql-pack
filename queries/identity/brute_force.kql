@@ -1,0 +1,8 @@
+// Brute force - failed sign-ins from a single IP
+// MITRE: T1110
+SigninLogs
+| where TimeGenerated > ago(1h)
+| where ResultType != "0"
+| summarize FailedAttempts = count(), DistinctUsers = dcount(UserPrincipalName) by IPAddress, bin(TimeGenerated, 5m)
+| where FailedAttempts > 10
+| order by FailedAttempts desc

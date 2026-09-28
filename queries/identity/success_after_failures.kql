@@ -1,0 +1,13 @@
+// Successful sign-in after multiple failures from same IP
+// MITRE: T1078
+let failures = SigninLogs
+| where TimeGenerated > ago(1h)
+| where ResultType != "0"
+| summarize FailedCount = count(), LastFailure = max(TimeGenerated) by UserPrincipalName, IPAddress
+| where FailedCount >= 5;
+SigninLogs
+| where TimeGenerated > ago(1h)
+| where ResultType == "0"
+| join kind=inner failures on UserPrincipalName, IPAddress
+| where TimeGenerated between (LastFailure .. LastFailure + 10m)
+| project TimeGenerated, UserPrincipalName, IPAddress, AppDisplayName, Location

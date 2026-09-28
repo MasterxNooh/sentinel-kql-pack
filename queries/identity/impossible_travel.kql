@@ -1,0 +1,15 @@
+// Impossible travel - successful sign-ins from distant locations in short time
+// MITRE: T1078
+SigninLogs
+| where TimeGenerated > ago(24h)
+| where ResultType == "0"
+| extend Country = tostring(LocationDetails.countryOrRegion)
+| extend Lat = todouble(LocationDetails.geoCoordinates.latitude)
+| extend Lon = todouble(LocationDetails.geoCoordinates.longitude)
+| sort by UserPrincipalName, TimeGenerated asc
+| extend PrevTime = prev(TimeGenerated), PrevUser = prev(UserPrincipalName),
+         PrevCountry = prev(Country), PrevLat = prev(Lat), PrevLon = prev(Lon)
+| where UserPrincipalName == PrevUser and Country != PrevCountry
+| extend TimeDiffMinutes = datetime_diff('minute', TimeGenerated, PrevTime)
+| where TimeDiffMinutes < 60
+| project TimeGenerated, UserPrincipalName, FromCountry = PrevCountry, ToCountry = Country, TimeDiffMinutes
